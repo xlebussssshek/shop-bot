@@ -11,19 +11,16 @@ load_dotenv()
 @dataclass(slots=True)
 class Settings:
     bot_token: str
-    admin_ids: set[int]
+    admin_ids: list[int]
     db_path: str
 
+    @property
+    def parsed_admin_ids(self) -> list[int]:
+        return [int(x) for x in self.admin_ids]
 
 
-def _parse_admin_ids(raw: str) -> set[int]:
-    result: set[int] = set()
-    for item in raw.split(','):
-        item = item.strip()
-        if item:
-            result.add(int(item))
-    return result
-
+def _parse_admin_ids(raw: str) -> list[int]:
+    return [int(x.strip()) for x in raw.split(',') if x.strip().isdigit()]
 
 
 def get_settings() -> Settings:

@@ -1,4 +1,5 @@
-from aiogram import Bot, F, Router
+import logging
+from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
@@ -72,4 +73,7 @@ async def get_comment(message: Message, state: FSMContext, repo: Repo, settings:
     await message.answer(order_confirmation_text(order_id))
 
     admin_text = admin_order_text(order, items)
-    await notify_admins(message.bot, settings.admin_ids, admin_text, message.from_user.id, order_id)
+    try:
+        await notify_admins(message.bot, settings.admin_ids, admin_text, message.from_user.id, order_id)
+    except Exception:
+        logging.exception('Failed to notify admins')
