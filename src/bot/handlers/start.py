@@ -1,5 +1,5 @@
 from aiogram import F, Router
-from aiogram.filters import CommandStart
+from aiogram.filters import Command, CommandStart
 from aiogram.types import CallbackQuery, Message
 
 from src.bot.keyboards import main_menu_keyboard
@@ -12,6 +12,11 @@ router = Router()
 @router.message(CommandStart())
 async def cmd_start(message: Message, settings: Settings):
     await message.answer(MAIN_MENU, reply_markup=main_menu_keyboard(message.from_user.id in settings.admin_ids))
+
+
+@router.message(Command("id"))
+async def cmd_id(message: Message):
+    await message.answer(f"Ваш ID: {message.from_user.id}")
 
 
 @router.callback_query(F.data == 'menu:main')

@@ -25,13 +25,15 @@ async def main() -> None:
 
     repo = Repo(settings.db_path)
     dp.update.middleware(ErrorLoggingMiddleware())
-    dp['repo'] = repo
     dp['settings'] = settings
 
     setup_routers(dp)
 
     logging.info('Bot started')
-    await dp.start_polling(bot, repo=repo, settings=settings)
+    try:
+        await dp.start_polling(bot, repo=repo, settings=settings)
+    finally:
+        await repo.close()
 
 
 if __name__ == '__main__':
