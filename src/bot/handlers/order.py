@@ -3,6 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from src.bot.states import CheckoutState
+from src.config import Settings
 from src.db.repo import Repo
 from src.services.notify_service import notify_admins
 from src.services.order_service import admin_order_text, order_confirmation_text
@@ -48,12 +49,11 @@ async def get_address(message: Message, state: FSMContext):
 
 
 @router.message(CheckoutState.comment)
-async def get_comment(message: Message, state: FSMContext):
+async def get_comment(message: Message, state: FSMContext, repo: Repo, settings: Settings):
     data = await state.get_data()
     comment = message.text.strip()
     await state.clear()
 
-    repo: Repo = message.bot['repo']
     items = await repo.get_cart(message.from_user.id)
     if not items:
         await message.answer('Корзина пуста, заказ не создан.')
@@ -71,6 +71,5 @@ async def get_comment(message: Message, state: FSMContext):
 
     await message.answer(order_confirmation_text(order_id))
 
-    settings = message.bot['settings']
     admin_text = admin_order_text(order, items)
     await notify_admins(message.bot, settings.admin_ids, admin_text, message.from_user.id, order_id)
